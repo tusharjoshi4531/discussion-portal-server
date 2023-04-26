@@ -7,6 +7,6 @@ const TopicSchema = new Schema<ITopicData>({
     tags: { type: [String], required: true },
 });
 
-const UserModel = model<ITopicData>("User", TopicSchema);
+const TopicModel = model<ITopicData>("Topics", TopicSchema);
 
-export default UserModel;
+export default TopicModel;
