@@ -5,5 +5,10 @@ export interface IUserData {
     password: string;
 }
 
+export interface IAuthenticatedUserData {
+    username: string;
+    userId: string;
+}
+
 export interface IAuthorizedRequest<T>
-    extends Request<{}, {}, { userData: IUserData } & T> {}
+    extends Request<{}, {}, { userData: IAuthenticatedUserData } & T> {}
