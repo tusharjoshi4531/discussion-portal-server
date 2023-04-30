@@ -1,15 +1,19 @@
 import { RequestHandler } from "express";
-import { IAuthorizedRequest } from "../../types/authentication";
+import {
+    AuthorizedRequestBody,
+    IAuthorizedRequest,
+} from "../../types/authentication";
 import UserTopicStoreModel from "../../models/user-topic-store";
 import {
     starTopicInDatabase,
     unstarTopicInDatabase,
 } from "./util/utility-functions";
 
-export const starTopic: RequestHandler = async (
-    req: IAuthorizedRequest<{ topicId: string; state: boolean }>,
-    res
-) => {
+export const starTopic: RequestHandler<
+    any,
+    any,
+    AuthorizedRequestBody<{ topicId: string; state: boolean }>
+> = async (req, res) => {
     try {
         const userId = req.body.userData.userId;
         const topicId = req.body.topicId;

@@ -13,7 +13,7 @@ const DiscussionRouter = Router();
 DiscussionRouter.get("/getPublic", getTopicsForPublic);
 
 DiscussionRouter.use(authorizeToken);
-DiscussionRouter.get("/getUser", getTopicForUser);
+DiscussionRouter.get("/getPrivate/:type", getTopicForUser);
 DiscussionRouter.post("/add", addTopic);
 DiscussionRouter.patch("/star", starTopic);
 

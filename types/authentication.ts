@@ -10,5 +10,9 @@ export interface IAuthenticatedUserData {
     userId: string;
 }
 
-export interface IAuthorizedRequest<T>
-    extends Request<{}, {}, { userData: IAuthenticatedUserData } & T> {}
+export type AuthorizedRequestBody<T = {}> = {
+    userData: IAuthenticatedUserData;
+} & T;
+
+export interface IAuthorizedRequest<T, P = {}, Q = {}>
+    extends Request<P, Q, { userData: IAuthenticatedUserData } & T> {}

@@ -4,8 +4,8 @@ import UserModel from "../../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const signup: RequestHandler = async (
-    req: Request<{}, {}, ISignUpRequestBody>,
+const signup: RequestHandler<any, any, ISignUpRequestBody> = async (
+    req,
     res
 ) => {
     const { username, password } = req.body;

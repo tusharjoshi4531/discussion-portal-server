@@ -1,12 +1,24 @@
 import { RequestHandler } from "express";
-import { IResponseTopicData, ITopicData } from "../../types/discussion";
+import {
+    IGetTopicParams,
+    IResponseTopicData,
+    ITopicData,
+} from "../../types/discussion";
 import {
     getTopicsFromDatabase,
     getTopicsStarredByUser,
 } from "./util/utility-functions";
-import { IAuthorizedRequest } from "../../types/authentication";
+import {
+    AuthorizedRequestBody,
+    IAuthorizedRequest,
+} from "../../types/authentication";
 
-export const getTopicsForPublic: RequestHandler = async (req, res) => {
+export const getTopicsForPublic: RequestHandler<
+    any,
+    any,
+    any,
+    { tags: string }
+> = async (req, res) => {
     const query = req.query.tags;
 
     try {
@@ -17,21 +29,29 @@ export const getTopicsForPublic: RequestHandler = async (req, res) => {
     }
 };
 
-export const getTopicForUser: RequestHandler = async (
-    req: IAuthorizedRequest<IResponseTopicData>,
-    res
-) => {
+export const getTopicForUser: RequestHandler<
+    IGetTopicParams,
+    any,
+    AuthorizedRequestBody,
+    { tags: string }
+> = async (req, res) => {
     const query = req.query.tags;
+    const { type } = req.params;
+
+    console.log(type);
 
     const data = await getTopicsFromDatabase(query as string);
+
     const starredTopicsId = await getTopicsStarredByUser(
         req.body.userData.userId
     );
 
     return res.status(200).json(
-        data.map((data) => ({
-            ...data,
-            isStarred: starredTopicsId.includes(data.id),
-        }))
+        data
+            .map((data) => ({
+                ...data,
+                isStarred: starredTopicsId.includes(data.id),
+            }))
+            .filter((data) => type === "all" || data.isStarred)
     );
 };

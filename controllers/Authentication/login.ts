@@ -4,10 +4,7 @@ import UserModel from "../../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const login: RequestHandler = async (
-    req: Request<{}, {}, ILoginRequestBody>,
-    res
-) => {
+const login: RequestHandler<any, any, ILoginRequestBody> = async (req, res) => {
     // Extract login info from request
     const { username, password } = req.body;
 
@@ -46,4 +43,4 @@ const login: RequestHandler = async (
     }
 };
 
-export default login
+export default login;

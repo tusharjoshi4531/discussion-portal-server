@@ -1,10 +1,10 @@
 import { RequestHandler } from "express";
-import { IAuthorizedRequest } from "../../types/authentication";
+import { AuthorizedRequestBody, IAuthorizedRequest } from "../../types/authentication";
 import { ITopicData } from "../../types/discussion";
 import TopicModel from "../../models/topic";
 
-const addTopic: RequestHandler = async (
-    req: IAuthorizedRequest<ITopicData>,
+const addTopic: RequestHandler<any, any, AuthorizedRequestBody<ITopicData>> = async (
+    req,
     res
 ) => {
     console.log(req.body);

@@ -9,6 +9,10 @@ export interface IResponseTopicData extends ITopicData {
     isStarred: boolean;
 }
 
+export interface IGetTopicParams {
+    type: string,
+}
+
 export interface IUserTopicStoreData {
     userId : string;
     starredId: string[];
