@@ -21,6 +21,7 @@ export const getTopicsFromDatabase = async (
         title: topic.title,
         tags: topic.tags,
         author: topic.author,
+        description: topic.description,
         id: topic._id.toString(),
         isStarred: false,
     }));
@@ -64,4 +65,20 @@ export const unstarTopicInDatabase = async (
 
     userData.starredId = userData.starredId.filter((id) => id !== topicId);
     userData.save();
+};
+
+export const getTopicByIdFromDatabase = async (
+    topicId: string
+): Promise<ITopicData> => {
+    if (topicId === "") {
+        throw new Error("Couldn't find topic id");
+    }
+
+    const result = await TopicModel.findOne({ id: topicId });
+
+    if (!result) {
+        throw new Error("Couldn't fid topic with given id");
+    }
+
+    return result;
 };

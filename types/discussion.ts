@@ -1,6 +1,7 @@
 export interface ITopicData {
     author: string;
     title: string;
+    description: string;
     tags: string[];
 }
 

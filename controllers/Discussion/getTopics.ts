@@ -5,13 +5,11 @@ import {
     ITopicData,
 } from "../../types/discussion";
 import {
+    getTopicByIdFromDatabase,
     getTopicsFromDatabase,
     getTopicsStarredByUser,
 } from "./util/utility-functions";
-import {
-    AuthorizedRequestBody,
-    IAuthorizedRequest,
-} from "../../types/authentication";
+import { AuthorizedRequestBody } from "../../types/authentication";
 
 export const getTopicsForPublic: RequestHandler<
     any,
@@ -33,12 +31,22 @@ export const getTopicForUser: RequestHandler<
     IGetTopicParams,
     any,
     AuthorizedRequestBody,
-    { tags: string }
+    { tags: string; id: string }
 > = async (req, res) => {
     const query = req.query.tags;
     const { type } = req.params;
 
-    console.log(type);
+    if (type === "id") {
+        try {
+            const result = await getTopicByIdFromDatabase(req.query.tags);
+            return res.status(200).json(result);
+        } catch (error) {
+            console.log(error);
+            res.status(404).json({
+                message: "Something wnet wrond in finding topic by id",
+            });
+        }
+    }
 
     const data = await getTopicsFromDatabase(query as string);
 
