@@ -10,11 +10,29 @@ export interface IResponseTopicData extends ITopicData {
     isStarred: boolean;
 }
 
-export interface IGetTopicParams {
-    type: string,
-}
 
 export interface IUserTopicStoreData {
-    userId : string;
+    userId: string;
     starredId: string[];
+}
+
+export interface IComment {
+    id: string;
+    author: string;
+    body: string;
+    upvotes: number;
+    subComments: IComment[];
+}
+
+export interface IDiscussionReply {
+    id: string;
+    author: string;
+    content: string;
+    upvotes: number;
+    comments: IComment[];
+}
+
+export interface IDiscussionData {
+    id: string;
+    replies: IDiscussionReply[];
 }

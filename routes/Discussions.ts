@@ -1,20 +1,14 @@
 import { Router } from "express";
 import { authorizeToken } from "../middleware/Authorization";
-import addTopic from "../controllers/Discussion/addTopic";
-
-import {
-    getTopicForUser,
-    getTopicsForPublic,
-} from "../controllers/Discussion/getTopics";
-import { starTopic } from "../controllers/Discussion/starTopic";
+import { getReplies } from "../controllers/Discussion/getReplies";
+import { addReply } from "../controllers/Discussion/addReply";
 
 const DiscussionRouter = Router();
 
-DiscussionRouter.get("/getPublic", getTopicsForPublic);
+DiscussionRouter.get("/replies", getReplies);
 
 DiscussionRouter.use(authorizeToken);
-DiscussionRouter.get("/getPrivate/:type", getTopicForUser);
-DiscussionRouter.post("/add", addTopic);
-DiscussionRouter.patch("/star", starTopic);
+
+DiscussionRouter.post("/replies", addReply);
 
 export default DiscussionRouter;

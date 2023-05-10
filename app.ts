@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import express from "express";
 import cors from "cors";
 import AuthRouter from "./routes/Authentication";
+import TopicRouter from "./routes/Topic";
 import DiscussionRouter from "./routes/Discussions";
 
 const app = express();
@@ -16,7 +17,8 @@ app.use(
 app.use(express.json());
 
 app.use("/auth", AuthRouter);
-app.use("/topics", DiscussionRouter);
+app.use("/topics", TopicRouter);
+app.use("/discussions", DiscussionRouter);
 
 const mongoDbApiKey = process.env.MONGODB_API_KEY!;
 const tempMongoDbApiKey = process.env.TEMP_MONGO_URL!;

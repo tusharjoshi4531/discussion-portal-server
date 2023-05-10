@@ -1,9 +1,5 @@
 import { RequestHandler } from "express";
-import {
-    IGetTopicParams,
-    IResponseTopicData,
-    ITopicData,
-} from "../../types/discussion";
+import { IResponseTopicData, ITopicData } from "../../types/discussion";
 import {
     getTopicByIdFromDatabase,
     getTopicsFromDatabase,
@@ -15,51 +11,67 @@ export const getTopicsForPublic: RequestHandler<
     any,
     any,
     any,
-    { tags: string }
+    { tags: string; getStarred: boolean }
 > = async (req, res) => {
-    const query = req.query.tags;
+    const { tags } = req.query;
+
+    console.log(tags);
 
     try {
-        const data = await getTopicsFromDatabase(query as string);
+        const data = await getTopicsFromDatabase(tags);
         res.status(200).json(data);
     } catch (error) {
         res.status(404).send("Couldn't get topics");
     }
 };
 
-export const getTopicForUser: RequestHandler<
-    IGetTopicParams,
+export const getTopicsForUser: RequestHandler<
+    any,
     any,
     AuthorizedRequestBody,
-    { tags: string; id: string }
+    { tags: string; getStarred: string }
 > = async (req, res) => {
-    const query = req.query.tags;
-    const { type } = req.params;
+    const { tags, getStarred } = req.query;
 
-    if (type === "id") {
-        try {
-            const result = await getTopicByIdFromDatabase(req.query.tags);
-            return res.status(200).json(result);
-        } catch (error) {
-            console.log(error);
-            res.status(404).json({
-                message: "Something wnet wrond in finding topic by id",
-            });
-        }
+    try {
+        const data = await getTopicsFromDatabase(tags);
+
+        const starredTopicsId = await getTopicsStarredByUser(
+            req.body.userData.userId
+        );
+
+        return res.status(200).json(
+            data
+                .map((data) => ({
+                    ...data,
+                    isStarred: starredTopicsId.includes(data.id),
+                }))
+                .filter((data) => getStarred === "false" || data.isStarred)
+        );
+    } catch (error) {
+        console.log(error);
+        return res.status(404).json({
+            message: "Something went wrong while fetching topics for users",
+        });
     }
+};
 
-    const data = await getTopicsFromDatabase(query as string);
+export const getTopicById: RequestHandler<
+    any,
+    any,
+    any,
+    { id: string }
+> = async (req, res) => {
+    const { id } = req.query;
 
-    const starredTopicsId = await getTopicsStarredByUser(
-        req.body.userData.userId
-    );
+    try {
+        const data = await getTopicByIdFromDatabase(id);
 
-    return res.status(200).json(
-        data
-            .map((data) => ({
-                ...data,
-                isStarred: starredTopicsId.includes(data.id),
-            }))
-            .filter((data) => type === "all" || data.isStarred)
-    );
+        return res.status(200).json(data);
+    } catch (error) {
+        console.log(error);
+        return res.status(404).json({
+            message: "Something went wrong while fetching topic by id",
+        });
+    }
 };

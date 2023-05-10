@@ -1,21 +1,25 @@
-import { Types } from "mongoose";
-import { IResponseTopicData, ITopicData } from "../../../types/discussion";
+import {
+    IDiscussionReply,
+    IResponseTopicData,
+    ITopicData,
+} from "../../../types/discussion";
 import TopicModel from "../../../models/topic";
 import { query } from "express";
 import UserTopicStoreModel from "../../../models/user-topic-store";
+import DiscussionModel from "../../../models/discussion";
 
 export const getTopicsFromDatabase = async (
-    query?: string
+    tags?: string
 ): Promise<IResponseTopicData[]> => {
-    let result: (ITopicData & {
-        _id: Types.ObjectId;
-    })[];
-    if (query === "all" || query === undefined) {
+    let result;
+    if (tags === "all" || query === undefined) {
         result = await TopicModel.find();
     } else {
-        const tags = JSON.parse(query!);
-        result = await TopicModel.find({ tags: { $all: tags } });
+        const query = JSON.parse(tags!);
+        result = await TopicModel.find({ tags: { $all: query } });
     }
+
+    // TODO FIX QUERRIES
 
     const data: IResponseTopicData[] = result.map((topic) => ({
         title: topic.title,
@@ -34,6 +38,22 @@ export const getTopicsStarredByUser = async (
 ): Promise<string[]> => {
     const result = await UserTopicStoreModel.findOne({ userId });
     return result ? result.starredId : [];
+};
+
+export const getTopicByIdFromDatabase = async (
+    topicId: string
+): Promise<ITopicData> => {
+    if (topicId === "") {
+        throw new Error("Couldn't find topic id");
+    }
+
+    const result = await TopicModel.findById(topicId);
+
+    if (!result) {
+        throw new Error("Couldn't fid topic with given id");
+    }
+
+    return result;
 };
 
 export const starTopicInDatabase = async (userId: string, topicId: string) => {
@@ -67,18 +87,24 @@ export const unstarTopicInDatabase = async (
     userData.save();
 };
 
-export const getTopicByIdFromDatabase = async (
+export const getRepliesByTopicId = async (
     topicId: string
-): Promise<ITopicData> => {
-    if (topicId === "") {
-        throw new Error("Couldn't find topic id");
+): Promise<IDiscussionReply[]> => {
+    const result = await DiscussionModel.findOne({ id: topicId });
+
+    return result ? result.replies : [];
+};
+
+export const addReplyToDiscussionTopicId = async (
+    topicId: string,
+    reply: IDiscussionReply
+) => {
+    let discussion = await DiscussionModel.findOne({ id: topicId });
+
+    if (!discussion) {
+        discussion = await DiscussionModel.create({ id: topicId, replies: [] });
     }
 
-    const result = await TopicModel.findOne({ id: topicId });
-
-    if (!result) {
-        throw new Error("Couldn't fid topic with given id");
-    }
-
-    return result;
+    discussion.replies.push(reply);
+    discussion.save();
 };
