@@ -21,6 +21,8 @@ export const addComment: RequestHandler<
             author: userData.username,
             body: content,
             upvotes: 0,
+            upvotees: [],
+            downvotees: [],
             subComments: [],
         };
 

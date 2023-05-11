@@ -11,6 +11,8 @@ CommentSchema.add({
     author: { type: String, required: true },
     body: { type: String, required: true },
     upvotes: { type: Number, required: true },
+    upvotees: { type: [String], required: true },
+    downvotees: { type: [String], required: true },
     subComments: { type: [CommentSchema], required: true },
 });
 
@@ -19,6 +21,8 @@ const DiscussionReplySchema = new Schema<IDiscussionReply>({
     author: { type: String, required: true },
     content: { type: String, required: true },
     upvotes: { type: Number, required: true },
+    upvotees: { type: [String], required: true },
+    downvotees: { type: [String], required: true },
     comments: [CommentSchema],
 });
 

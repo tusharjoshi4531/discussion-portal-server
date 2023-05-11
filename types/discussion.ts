@@ -10,7 +10,6 @@ export interface IResponseTopicData extends ITopicData {
     isStarred: boolean;
 }
 
-
 export interface IUserTopicStoreData {
     userId: string;
     starredId: string[];
@@ -21,6 +20,8 @@ export interface IComment {
     author: string;
     body: string;
     upvotes: number;
+    upvotees: string[];
+    downvotees: string[];
     subComments: IComment[];
 }
 
@@ -29,10 +30,30 @@ export interface IDiscussionReply {
     author: string;
     content: string;
     upvotes: number;
+    upvotees: string[];
+    downvotees: string[];
     comments: IComment[];
 }
 
 export interface IDiscussionData {
     id: string;
     replies: IDiscussionReply[];
+}
+
+export interface ICommentResponse {
+    id: string;
+    author: string;
+    body: string;
+    upvotes: number;
+    upvoteStatus: "up" | "down" | "none";
+    subComments?: ICommentResponse[];
+}
+
+export interface IDiscussionReplyResponse {
+    id: string;
+    author: string;
+    content: string;
+    upvotes: number;
+    upvoteStatus: "up" | "down" | "none";
+    comments: ICommentResponse[];
 }

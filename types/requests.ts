@@ -14,3 +14,9 @@ export interface IAddCommentRequestBody {
     replyId: string;
     content: string;
 }
+
+export interface IChangeReplyUpvoteRequestBody {
+    topicId: string;
+    replyId: string;
+    type: string;
+}

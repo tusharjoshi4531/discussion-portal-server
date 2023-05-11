@@ -22,6 +22,8 @@ export const addReply: RequestHandler<
             content: reply,
             comments: [],
             upvotes: 0,
+            upvotees: [],
+            downvotees: [],
         };
 
         addReplyToDiscussionTopicId(topicId, generatedReply);

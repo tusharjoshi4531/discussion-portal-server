@@ -1,6 +1,8 @@
 import {
     IComment,
+    ICommentResponse,
     IDiscussionReply,
+    IDiscussionReplyResponse,
     IResponseTopicData,
     ITopicData,
 } from "../../../types/discussion";
@@ -96,6 +98,48 @@ export const getRepliesByTopicId = async (
     return result ? result.replies : [];
 };
 
+const getTransformedComment = (
+    comment: IComment,
+    userId: string
+): ICommentResponse => {
+    let upvoteStatus: "up" | "down" | "none" = "none";
+    if (comment.upvotees.includes(userId)) upvoteStatus = "up";
+    if (comment.downvotees.includes(userId)) upvoteStatus = "down";
+
+    const transformedComment: ICommentResponse = {
+        id: comment.id,
+        author: comment.author,
+        body: comment.body,
+        upvotes: comment.upvotes,
+        upvoteStatus,
+        subComments: comment.subComments.map((subComment) =>
+            getTransformedComment(subComment, userId)
+        ),
+    };
+
+    return transformedComment;
+};
+
+export const getTransformedReply = (
+    reply: IDiscussionReply,
+    userId: string
+): IDiscussionReplyResponse => {
+    let upvoteStatus: "up" | "down" | "none" = "none";
+    if (reply.upvotees.includes(userId)) upvoteStatus = "up";
+    if (reply.downvotees.includes(userId)) upvoteStatus = "down";
+
+    const transformedReply: IDiscussionReplyResponse = {
+        id: reply.id,
+        author: reply.author,
+        content: reply.content,
+        upvotes: reply.upvotes,
+        upvoteStatus,
+        comments: [],
+    };
+
+    return transformedReply;
+};
+
 export const addReplyToDiscussionTopicId = async (
     topicId: string,
     reply: IDiscussionReply
@@ -111,12 +155,12 @@ export const addReplyToDiscussionTopicId = async (
 };
 
 const findComment = (id: string, comment: IComment): IComment | undefined => {
-    if(comment.id === id) return comment;
+    if (comment.id === id) return comment;
     for (let el of comment.subComments) {
-        if(findComment(id, el)) return el;
+        if (findComment(id, el)) return el;
     }
     return undefined;
-}
+};
 
 export const addCommentToReply = async (
     topicId: string,
@@ -136,16 +180,16 @@ export const addCommentToReply = async (
         throw new Error("Couldn't find reply");
     }
 
-    if(parentId === "") {
+    if (parentId === "") {
         reply.comments.push(comment);
-    }else{
+    } else {
         let parent: IComment | undefined;
-        for(let el of reply.comments) {
+        for (let el of reply.comments) {
             parent = findComment(parentId, el);
-            if(parent) break;
+            if (parent) break;
         }
 
-        if(!parent) {
+        if (!parent) {
             throw new Error("Couldn't find comment");
         }
 
