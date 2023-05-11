@@ -1,4 +1,5 @@
 import {
+    IComment,
     IDiscussionReply,
     IResponseTopicData,
     ITopicData,
@@ -106,5 +107,50 @@ export const addReplyToDiscussionTopicId = async (
     }
 
     discussion.replies.push(reply);
+    discussion.save();
+};
+
+const findComment = (id: string, comment: IComment): IComment | undefined => {
+    if(comment.id === id) return comment;
+    for (let el of comment.subComments) {
+        if(findComment(id, el)) return el;
+    }
+    return undefined;
+}
+
+export const addCommentToReply = async (
+    topicId: string,
+    parentId: string,
+    replyId: string,
+    comment: IComment
+) => {
+    const discussion = await DiscussionModel.findOne({ id: topicId });
+
+    if (!discussion) {
+        throw new Error("Couldn't find discussion");
+    }
+
+    const reply = discussion!.replies.find((reply) => reply.id === replyId);
+
+    if (!reply) {
+        throw new Error("Couldn't find reply");
+    }
+
+    if(parentId === "") {
+        reply.comments.push(comment);
+    }else{
+        let parent: IComment | undefined;
+        for(let el of reply.comments) {
+            parent = findComment(parentId, el);
+            if(parent) break;
+        }
+
+        if(!parent) {
+            throw new Error("Couldn't find comment");
+        }
+
+        parent.subComments.push(comment);
+    }
+
     discussion.save();
 };
