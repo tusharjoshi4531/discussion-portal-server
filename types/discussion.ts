@@ -45,7 +45,7 @@ export interface ICommentResponse {
     author: string;
     body: string;
     upvotes: number;
-    upvoteStatus: "up" | "down" | "none";
+    upvoteStatus: 0 | -1 | 1;
     subComments?: ICommentResponse[];
 }
 
@@ -54,6 +54,6 @@ export interface IDiscussionReplyResponse {
     author: string;
     content: string;
     upvotes: number;
-    upvoteStatus: "up" | "down" | "none";
+    upvoteStatus: -1 | 0 | 1;
     comments: ICommentResponse[];
 }

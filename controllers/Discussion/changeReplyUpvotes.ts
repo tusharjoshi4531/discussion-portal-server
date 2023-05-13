@@ -1,12 +1,13 @@
 import { RequestHandler } from "express";
 import { AuthorizedRequestBody } from "../../types/authentication";
-import { IChangeReplyUpvoteRequestBody } from "../../types/requests";
+import { IChangeReplyUpvotesRequestBody } from "../../types/requests";
 import DiscussionModel from "../../models/discussion";
+import { updateUpvotes } from "./util/utility-functions";
 
 export const changeReplyUpvotes: RequestHandler<
     any,
     any,
-    AuthorizedRequestBody & IChangeReplyUpvoteRequestBody
+    AuthorizedRequestBody & IChangeReplyUpvotesRequestBody
 > = async (req, res) => {
     const { userData, type, topicId, replyId } = req.body;
 
@@ -25,16 +26,15 @@ export const changeReplyUpvotes: RequestHandler<
             return res.status(404).json({ message: "Couldn't find reply" });
         }
 
-        reply.upvotees = reply.upvotees.filter((id) => id !== userData.userId);
-        reply.downvotees = reply.downvotees.filter(
-            (id) => id !== userData.userId
+        const { upvotees, downvotees } = updateUpvotes(
+            reply.upvotees,
+            reply.downvotees,
+            userData.userId,
+            type
         );
 
-        if (type === "up") {
-            reply.upvotees.push(userData.userId);
-        } else if (type === "down") {
-            reply.downvotees.push(userData.userId);
-        }
+        reply.upvotees = upvotees;
+        reply.downvotees = downvotees;
         reply.upvotes = reply.upvotees.length - reply.downvotees.length;
 
         data.save();

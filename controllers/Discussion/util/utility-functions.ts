@@ -90,21 +90,72 @@ export const unstarTopicInDatabase = async (
     userData.save();
 };
 
+export const getCommentById = (
+    commentId: string,
+    comments: IComment[]
+): IComment | undefined => {
+    let comment = undefined;
+    for (let el of comments) {
+        if (el.id === commentId) return el;
+        comment = getCommentById(commentId, el.subComments);
+        if (comment) return comment;
+    }
+    return undefined;
+};
+
+export const updateUpvotes = (
+    upvotees: string[],
+    downvotees: string[],
+    userId: string,
+    type: string
+): { upvotees: string[]; downvotees: string[] } => {
+    upvotees = upvotees.filter((id) => id !== userId);
+    downvotees = downvotees.filter((id) => id !== userId);
+
+    if (type === "up") {
+        upvotees.push(userId);
+    } else if (type === "down") {
+        downvotees.push(userId);
+    }
+
+    return { upvotees, downvotees };
+};
+
 export const getRepliesByTopicId = async (
     topicId: string
 ): Promise<IDiscussionReply[]> => {
     const result = await DiscussionModel.findOne({ id: topicId });
 
-    return result ? result.replies : [];
+    if (!result) return [];
+
+    result.replies.sort((a, b) => b.upvotes - a.upvotes);
+    result.save();
+
+    return result.replies;
+};
+
+const getUpvoteStatus = (
+    userId: string,
+    upvotees: string[],
+    downvotees: string[]
+): -1 | 0 | 1 => {
+    let upvoteStatus: -1 | 0 | 1 = 0;
+    if (upvotees.includes(userId)) upvoteStatus = 1;
+    if (downvotees.includes(userId)) upvoteStatus = -1;
+    return upvoteStatus;
 };
 
 const getTransformedComment = (
     comment: IComment,
     userId: string
 ): ICommentResponse => {
-    let upvoteStatus: "up" | "down" | "none" = "none";
-    if (comment.upvotees.includes(userId)) upvoteStatus = "up";
-    if (comment.downvotees.includes(userId)) upvoteStatus = "down";
+    const upvoteStatus = getUpvoteStatus(
+        userId,
+        comment.upvotees,
+        comment.downvotees
+    );
+
+    comment.subComments.sort((a, b) => b.upvotes - a.upvotes);
 
     const transformedComment: ICommentResponse = {
         id: comment.id,
@@ -124,9 +175,13 @@ export const getTransformedReply = (
     reply: IDiscussionReply,
     userId: string
 ): IDiscussionReplyResponse => {
-    let upvoteStatus: "up" | "down" | "none" = "none";
-    if (reply.upvotees.includes(userId)) upvoteStatus = "up";
-    if (reply.downvotees.includes(userId)) upvoteStatus = "down";
+    const upvoteStatus = getUpvoteStatus(
+        userId,
+        reply.upvotees,
+        reply.downvotees
+    );
+
+    reply.comments.sort((a, b) => b.upvotes - a.upvotes);
 
     const transformedReply: IDiscussionReplyResponse = {
         id: reply.id,
@@ -136,6 +191,10 @@ export const getTransformedReply = (
         upvoteStatus,
         comments: [],
     };
+
+    transformedReply.comments = reply.comments.map((comment) =>
+        getTransformedComment(comment, userId)
+    );
 
     return transformedReply;
 };

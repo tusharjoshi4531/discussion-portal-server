@@ -43,7 +43,7 @@ export const getRepliesPrivate: RequestHandler<
             getTransformedReply(reply, userData.userId)
         );
 
-        return res.status(200).json(data);
+        return res.status(200).json(resData);
     } catch (error) {
         console.log(error);
         return res
