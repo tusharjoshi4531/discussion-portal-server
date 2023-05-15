@@ -2,7 +2,12 @@ import { RequestHandler } from "express";
 import { AuthorizedRequestBody } from "../../types/authentication";
 import { IChangeCommentUpvotesRequestBody } from "../../types/requests";
 import DiscussionModel from "../../models/discussion";
-import { getCommentById, updateUpvotes } from "./util/utility-functions";
+import {
+    getCommentById,
+    getTransformedComment,
+    getTransformedReply,
+    updateUpvotes,
+} from "./util/utility-functions";
 
 export const changeCommentUpvotes: RequestHandler<
     any,
@@ -50,9 +55,9 @@ export const changeCommentUpvotes: RequestHandler<
         comment.upvotes = comment.upvotees.length - comment.downvotees.length;
         discussionData.save();
 
-        return res
-            .status(200)
-            .json({ message: "Successfully changed comment upvotes" });
+        const response = getTransformedReply(reply, userData.userId);
+
+        return res.status(200).json(response);
     } catch (error) {
         console.log(error);
         return res.status(404).json({

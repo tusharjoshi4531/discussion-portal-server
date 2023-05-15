@@ -145,7 +145,7 @@ const getUpvoteStatus = (
     return upvoteStatus;
 };
 
-const getTransformedComment = (
+export const getTransformedComment = (
     comment: IComment,
     userId: string
 ): ICommentResponse => {

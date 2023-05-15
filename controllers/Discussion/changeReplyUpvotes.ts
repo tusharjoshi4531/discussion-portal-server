@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { AuthorizedRequestBody } from "../../types/authentication";
 import { IChangeReplyUpvotesRequestBody } from "../../types/requests";
 import DiscussionModel from "../../models/discussion";
-import { updateUpvotes } from "./util/utility-functions";
+import { getTransformedReply, updateUpvotes } from "./util/utility-functions";
 
 export const changeReplyUpvotes: RequestHandler<
     any,
@@ -39,9 +39,9 @@ export const changeReplyUpvotes: RequestHandler<
 
         data.save();
 
-        return res
-            .status(200)
-            .json({ message: "Successfully changed upvotes" });
+        const response = getTransformedReply(reply, userData.userId);
+
+        return res.status(200).json(response);
     } catch (error) {
         console.log(error);
         return res
