@@ -255,5 +255,5 @@ export const addCommentToReply = async (
         parent.subComments.push(comment);
     }
 
-    discussion.save();
+    await discussion.save();
 };
