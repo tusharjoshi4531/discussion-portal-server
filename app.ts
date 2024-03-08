@@ -6,6 +6,7 @@ import TopicRouter from "./routes/Topic";
 // import DiscussionRouter from "./routes/Discussions";
 import RepliesRouter from "./routes/Replies";
 import CommentsRouter from "./routes/Comments";
+import Postgres from "./db/postgres";
 
 const app = express();
 
@@ -24,17 +25,6 @@ app.use("/topics", TopicRouter);
 app.use("/replies", RepliesRouter);
 app.use("/comments", CommentsRouter);
 
-const mongoDbApiKey = process.env.MONGODB_API_KEY!;
-const tempMongoDbApiKey = process.env.TEMP_MONGO_URL!;
-
-mongoose.set("strictQuery", false);
-mongoose
-  .connect(tempMongoDbApiKey)
-  .then(() => {
-    console.log("connected to mongoose");
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+Postgres.Instance.connect();
 
 export default app;
