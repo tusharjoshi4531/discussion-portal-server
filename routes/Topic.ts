@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { authorizeToken } from "../middleware/Authorization";
-import addTopic from "../controllers/Discussion/addTopic";
 
 import {
-    getTopicsForUser,
-    getTopicsForPublic,
-    getTopicById,
-} from "../controllers/Discussion/getTopics";
-import { starTopic } from "../controllers/Discussion/starTopic";
+  getTopicsForUser,
+  getTopicsForPublic,
+  getTopicById,
+  starTopic,
+  addTopic,
+} from "../controllers/topicsController";
 
 const TopicRouter = Router();
 
