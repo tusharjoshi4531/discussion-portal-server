@@ -1,6 +1,7 @@
 import { Router } from "express";
-import signup from "../controllers/Authentication/signup";
-import login from "../controllers/Authentication/login";
+
+import { login, signup } from "../controllers/authenticationController";
+
 
 const AuthRouter = Router();
 

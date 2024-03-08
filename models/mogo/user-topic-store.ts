@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IUserTopicStoreData } from "../types/discussion";
+import { IUserTopicStoreData } from "../../types/discussion";
 
 const UserTopicStoreSchema = new Schema<IUserTopicStoreData>({
     userId: { type: String, required: true },

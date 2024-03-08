@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { ITopicData } from "../types/discussion";
+import { ITopicData } from "../../types/discussion";
 
 export const TopicSchema = new Schema<ITopicData>({
     author: { type: String, required: true },

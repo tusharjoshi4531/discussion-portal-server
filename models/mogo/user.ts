@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IUserData } from "../types/authentication";
+import { IUserData } from "../../types/authentication";
 
 const UserSchema = new Schema<IUserData>({
     username: { type: String, required: true },
