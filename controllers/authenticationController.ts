@@ -63,6 +63,6 @@ export const signup: RequestHandler<any, any, ISignUpRequestBody> = async (
     res.status(201).json({ username, token, userId: result._id });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: "something went wrong" });
+    res.status(400).json({ message: "something went wrong" });
   }
 };
