@@ -29,7 +29,7 @@ const tempMongoDbApiKey = process.env.TEMP_MONGO_URL!;
 
 mongoose.set("strictQuery", false);
 mongoose
-  .connect(tempMongoDbApiKey)
+  .connect(mongoDbApiKey)
   .then(() => {
     console.log("connected to mongoose");
   })
