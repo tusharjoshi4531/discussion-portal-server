@@ -14,7 +14,9 @@
         "nodemon": "^2.0.22",
         "pg": "^8.11.3",
         "pg-hstore": "^2.3.4",
+        "reflect-metadata": "^0.2.1",
         "sequelize": "^6.37.1",
+        "sequelize-typescript": "^2.1.6",
         "uuid": "^9.0.0"
     },
     "devDependencies": {

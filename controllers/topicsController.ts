@@ -1,7 +1,11 @@
 import { RequestHandler } from "express";
 import { ITopicData } from "../types/discussion";
 import { AuthorizedRequestBody } from "../types/authentication";
-import TopicService from "../service/mongo/topic";
+import MongoTopicService from "../service/mongo/topic";
+import PostgresTopicService from "../service/postgres/topic";
+
+const TopicService =
+  process.env.DB === "mongo" ? MongoTopicService : PostgresTopicService;
 
 export const addTopic: RequestHandler<
   any,
@@ -9,7 +13,10 @@ export const addTopic: RequestHandler<
   AuthorizedRequestBody<ITopicData>
 > = async (req, res) => {
   console.log(req.body);
-  const topicData = req.body as ITopicData;
+  const topicData = {
+    ...(req.body as ITopicData),
+    authorId: req.body.userData.userId,
+  };
   console.log(topicData);
 
   try {

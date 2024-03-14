@@ -1,9 +1,9 @@
-import UserModel from "../../models/mogo/user";
+import UserModel from "../../models/postgres/user";
 
 export default {
   async findByUsername(username: string) {
     try {
-      const user = await UserModel.findOne({ username });
+      const user = await UserModel.findOne({ where: { username } });
 
       if (!user) {
         throw new Error("User not found");
@@ -18,7 +18,7 @@ export default {
 
   async exists(username: string) {
     try {
-      const user = await UserModel.findOne({ username });
+      const user = await UserModel.findOne({ where: { username } });
 
       return user ? true : false;
     } catch (err) {

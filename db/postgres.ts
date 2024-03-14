@@ -1,13 +1,15 @@
-import { Options, Sequelize } from "sequelize";
+import { Sequelize, SequelizeOptions } from "sequelize-typescript";
+
 
 // Push it to env file
-const pgConfig: Options = {
+const pgConfig: SequelizeOptions = {
   host: "localhost",
   port: 5432,
   username: "postgres",
   password: "Krmkmemah@4531",
   database: "discussion_portal",
   dialect: "postgres",
+  models: [__dirname + "../models/postgres"],
   logging(sql, timing) {
     console.log(sql);
   },
@@ -18,7 +20,14 @@ export default class Postgres {
   private static instance: Postgres;
 
   private constructor() {
-    this.client = new Sequelize(pgConfig);
+    this.client = new Sequelize({
+      host: pgConfig.host,
+      port: pgConfig.port,
+      username: pgConfig.username,
+      password: pgConfig.password,
+      database: pgConfig.database,
+      dialect: pgConfig.dialect,
+    });
   }
 
   public connect() {

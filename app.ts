@@ -7,6 +7,8 @@ import TopicRouter from "./routes/Topic";
 import RepliesRouter from "./routes/Replies";
 import CommentsRouter from "./routes/Comments";
 import Postgres from "./db/postgres";
+import config from "./config/config";
+import connectToMongoDb from "./db/mongo";
 
 const app = express();
 
@@ -25,6 +27,13 @@ app.use("/topics", TopicRouter);
 app.use("/replies", RepliesRouter);
 app.use("/comments", CommentsRouter);
 
-Postgres.Instance.connect();
+const { DATABASE_SERVICE } = config;
+
+// Connect to the database
+if (DATABASE_SERVICE === "mongo") {
+  connectToMongoDb();
+} else if (DATABASE_SERVICE === "postgres") {
+  Postgres.Instance.connect();
+}
 
 export default app;
