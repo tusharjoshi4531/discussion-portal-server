@@ -41,7 +41,6 @@ export default {
         comments = await CommentModel.find({ parentId });
       }
 
-
       comments.sort((a, b) => b.upvotes - a.upvotes);
       comments = comments.map(parseMongoDocumentId<IComment>);
 

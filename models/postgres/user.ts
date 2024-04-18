@@ -2,11 +2,20 @@ import { DataTypes } from "sequelize";
 import { IUserData } from "../../types/authentication";
 import { ID } from "../../types/util";
 import TopicModel from "./topic";
-import  {BelongsToMany, Column, HasMany, Model, Table } from "sequelize-typescript";
+import {
+  BelongsToMany,
+  Column,
+  HasMany,
+  Model,
+  Table,
+} from "sequelize-typescript";
 import UserStarTopic from "./userStarTopic";
 import Reply from "./reply";
 import UserUpvoteReply from "./userUpvoteReply";
 import UserDownvoteReply from "./userDownvoteReply";
+import UserUpvoteComment from "./UserUpvoteComment";
+import UserDownvoteComment from "./userDownvoteComment";
+import Comment from "./comment";
 
 // const sequelize = Postgres.Instance.Client;
 
@@ -43,7 +52,13 @@ export default class User extends Model implements ID<IUserData> {
 
   @BelongsToMany(() => Reply, () => UserDownvoteReply)
   declare downvotedReplies: Reply[];
-};
+
+  @BelongsToMany(() => Comment, () => UserUpvoteComment)
+  declare upvotedComments: Reply[];
+
+  @BelongsToMany(() => Comment, () => UserDownvoteComment)
+  declare downvotedComments: Reply[];
+}
 
 // class UserModel extends Model implements ID<IUserData> {
 //   declare _id: string;

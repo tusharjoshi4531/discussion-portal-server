@@ -6,6 +6,9 @@ import UserStarTopic from "../models/postgres/userStarTopic";
 import UserUpvoteReply from "../models/postgres/userUpvoteReply";
 import UserDownvoteReply from "../models/postgres/userDownvoteReply";
 import Reply from "../models/postgres/reply";
+import Comment from "../models/postgres/comment";
+import UserUpvoteComment from "../models/postgres/UserUpvoteComment";
+import UserDownvoteComment from "../models/postgres/userDownvoteComment";
 
 // Push it to env file
 const pgConfig: SequelizeOptions = {
@@ -41,6 +44,9 @@ export default class Postgres {
         UserUpvoteReply,
         UserDownvoteReply,
         Reply,
+        Comment,
+        UserUpvoteComment,
+        UserDownvoteComment,
       ]
     });
   }

@@ -1,7 +1,15 @@
 import { RequestHandler } from "express";
 import { AuthorizedRequestBody } from "../types/authentication";
 import { IAddCommentRequestBody } from "../types/requests";
-import CommentService from "../service/mongo/comment";
+import MongoCommentService from "../service/mongo/comment";
+import PostgresCommentService from "../service/postgres/comment";
+import config from "../config/config";
+
+// const CommentService =
+//   config.DATABASE_SERVICE === "mongo"
+//     ? MongoCommentService
+//     : PostgresCommentService;
+const CommentService = PostgresCommentService;
 
 export const addComment: RequestHandler<
   any,
@@ -20,12 +28,12 @@ export const addComment: RequestHandler<
       content
     );
 
-    const comment = {
-      id: result._id.toString(),
-      ...result.toObject(),
-    };
+    // const comment = {
+    //   id: result._id.toString(),
+    //   ...result.toObject(),
+    // };
 
-    return res.status(200).json(comment);
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
     return res

@@ -1,5 +1,6 @@
 import {
   AfterCreate,
+  AfterDestroy,
   BeforeCreate,
   Column,
   ForeignKey,
@@ -14,9 +15,9 @@ import Reply from "./reply";
 import UserUpvoteReply from "./userUpvoteReply";
 
 @Table({
-  tableName: "user_upvote_reply",
+  tableName: "user_downvote_reply",
   underscored: true,
-  modelName: "UserUpvoteReply",
+  modelName: "UserDownvoteReply",
 })
 export default class UserDownvoteReply extends Model {
   @ForeignKey(() => User)
@@ -34,19 +35,33 @@ export default class UserDownvoteReply extends Model {
   declare replyId: string;
 
   @AfterCreate
-  static async decrementDownvote(instance: UserDownvoteReply) {
-    await Reply.decrement("upvotes", {
-      by: 1,
-      where: { _id: instance.replyId },
-    });
-
-    await UserUpvoteReply.destroy({
+  static async decrementUpvote(instance: UserDownvoteReply) {
+    const deletedInstances = await UserUpvoteReply.destroy({
       where: {
         userId: instance.userId,
         replyId: instance.replyId,
       },
     });
+
+    const decrementBy = deletedInstances > 0 ? 2 : 1;
+
+    await Reply.decrement("upvotes", {
+      by: decrementBy,
+      where: {
+        id: instance.replyId,
+      },
+    });
   }
+
+  // @AfterDestroy
+  // static async incrementUpvote(instance: UserDownvoteReply) {
+  //   await Reply.increment("upvotes", {
+  //     by: 1,
+  //     where: {
+  //       id: instance.replyId,
+  //     },
+  //   });
+  // }
 
   @BeforeCreate
   static async checkIfDownvoted(instance: UserDownvoteReply) {

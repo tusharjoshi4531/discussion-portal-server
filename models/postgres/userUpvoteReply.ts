@@ -4,12 +4,10 @@ import {
   Column,
   ForeignKey,
   Model,
-  PrimaryKey,
   Table,
 } from "sequelize-typescript";
 import User from "./user";
 import { DataTypes } from "sequelize";
-import Topic from "./topic";
 import Reply from "./reply";
 import UserDownvoteReply from "./userDownvoteReply";
 
@@ -22,9 +20,7 @@ export default class UserUpvoteReply extends Model {
   @Column({
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
-    primaryKey: true,
   })
-
   @ForeignKey(() => User)
   @Column({
     type: DataTypes.UUID,
@@ -41,18 +37,29 @@ export default class UserUpvoteReply extends Model {
 
   @AfterCreate
   static async incrementUpvote(instance: UserUpvoteReply) {
-    await Reply.increment("upvotes", {
-      by: 1,
-      where: { _id: instance.replyId },
-    });
-
-    await UserDownvoteReply.destroy({
+    const deletedInstances = await UserDownvoteReply.destroy({
       where: {
         userId: instance.userId,
         replyId: instance.replyId,
       },
     });
+
+    const incrementBy = deletedInstances > 0 ? 2 : 1;
+
+    await Reply.increment("upvotes", {
+      by: incrementBy,
+      where: { _id: instance.replyId },
+    });
   }
+
+  // @BeforeDestroy
+  // static async decrementUpvote(instance: UserUpvoteReply) {
+  //   console.log("DESTROY UPVOTE");
+  //   // await Reply.decrement("upvotes", {
+  //   //   by: 1,
+  //   //   where: { _id: instance.replyId },
+  //   // });
+  // }
 
   @BeforeCreate
   static async checkIfUpvoted(instance: UserUpvoteReply) {
@@ -63,7 +70,7 @@ export default class UserUpvoteReply extends Model {
         userId: instance.userId,
         replyId: instance.replyId,
       },
-      attributes: ["reply_id"]
+      attributes: ["reply_id"],
     });
 
     if (upvote) {

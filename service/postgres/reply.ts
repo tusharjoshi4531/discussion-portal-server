@@ -6,6 +6,28 @@ import UserDownvoteReply from "../../models/postgres/userDownvoteReply";
 import UserUpvoteReply from "../../models/postgres/userUpvoteReply";
 import User from "../../models/postgres/user";
 
+const parseReplyUpvoteStatus = (reply: Reply, userId?: string) => {
+  const isUpvotedByUser = reply.upvotees.some(
+    (upvotee) => upvotee._id === userId
+  );
+  const isDownvotedByUser = reply.downvotees.some(
+    (downvotee) => downvotee._id === userId
+  );
+
+  let upvoteStatus = 0;
+  if (isUpvotedByUser) {
+    upvoteStatus = 1;
+  } else if (isDownvotedByUser) {
+    upvoteStatus = -1;
+  }
+
+  return {
+    ..._.omit(reply.toJSON(), ["upvotees", "downvotees", "_id"]),
+    id: reply._id,
+    upvoteStatus,
+  };
+};
+
 export default {
   async create(reply: string, topicId: string, author: string) {
     try {
@@ -48,25 +70,8 @@ export default {
           "downvotees",
           "_id",
         ]);
-        const isUpvotedByUser = reply.upvotees.some(
-          (upvotee) => upvotee._id === userId
-        );
-        const isDownvotedByUser = reply.downvotees.some(
-          (downvotee) => downvotee._id === userId
-        );
 
-        let upvoteStatus = 0;
-        if (isUpvotedByUser) {
-          upvoteStatus = 1;
-        } else if (isDownvotedByUser) {
-          upvoteStatus = -1;
-        }
-
-        return {
-          ...remainingReply,
-          id: reply._id,
-          upvoteStatus,
-        };
+        return parseReplyUpvoteStatus(reply, userId);
       });
 
       return topicData;
@@ -78,11 +83,42 @@ export default {
 
   async triggerUpvote(id: string, userId: string) {
     try {
-      await UserUpvoteReply.create({ userId, replyId: id });
+      const isUpvoted = await UserUpvoteReply.findOne({
+        where: { userId, replyId: id },
+      });
 
-      const reply = await Reply.findByPk(id);
+      if (isUpvoted) {
+        await UserUpvoteReply.destroy({
+          where: { userId, replyId: id },
+        });
 
-      return reply;
+        await Reply.decrement("upvotes", {
+          by: 1,
+          where: { _id: id },
+        });
+      } else {
+        await UserUpvoteReply.create({ userId, replyId: id });
+      }
+
+      const result = await Reply.findOne({
+        where: { _id: id },
+        include: [
+          {
+            model: User,
+            as: "upvotees",
+          },
+          {
+            model: User,
+            as: "downvotees",
+          },
+        ],
+      });
+
+      if (!result) {
+        throw new Error("Reply not found");
+      }
+
+      return parseReplyUpvoteStatus(result, userId);
     } catch (err) {
       console.log(err);
       throw new Error("Something went wrong while upvoting reply");
@@ -91,11 +127,46 @@ export default {
 
   async triggerDownvote(id: string, userId: string) {
     try {
-      await UserDownvoteReply.create({ userId, replyId: id });
+      const isDownvoted = await UserDownvoteReply.findOne({
+        where: { userId, replyId: id },
+      });
 
-      const reply = await Reply.findByPk(id);
+      if (isDownvoted) {
+        UserDownvoteReply.destroy({
+          where: { userId, replyId: id },
+        });
 
-      return reply;
+        await Reply.increment("upvotes", {
+          by: 1,
+          where: { _id: id },
+        });
+      } else {
+        await UserDownvoteReply.create({ userId, replyId: id });
+      }
+
+      const result = await Reply.findOne({
+        where: { _id: id },
+        include: [
+          {
+            model: User,
+            as: "upvotees",
+          },
+          {
+            model: User,
+            as: "downvotees",
+          },
+        ],
+      });
+
+      console.log({
+        result,
+      });
+
+      if (!result) {
+        throw new Error("Reply not found");
+      }
+
+      return parseReplyUpvoteStatus(result, userId);
     } catch (err) {
       console.log(err);
       throw new Error("Something went wrong while downvoting reply");
