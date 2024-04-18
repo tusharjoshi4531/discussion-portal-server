@@ -41,7 +41,7 @@ export const getTopicsForPublic: RequestHandler<
 
   try {
     const data = await TopicService.findByTag(tags);
-    res.status(201).json(data);
+    res.status(200).json(data);
   } catch (error) {
     console.log(error);
     return res.status(501).json({

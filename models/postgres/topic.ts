@@ -13,6 +13,7 @@ import {
 } from "sequelize-typescript";
 import User from "./user";
 import UserStarTopic from "./userStarTopic";
+import Reply from "./reply";
 
 @Table({
   tableName: "topics",
@@ -59,55 +60,9 @@ export default class Topic
   declare tags: Tags[];
   declare getTags: HasManyGetAssociationsMixin<Tags>;
 
+  @HasMany(() => Reply)
+  declare replies: Reply[];
+
   @BelongsToMany(() => User, () => UserStarTopic)
   declare starredBy: User[];
-
-  
 }
-
-// const sequelize = Postgres.Instance.Client;
-
-// class TopicModel extends Model implements ID<Omit<ITopicData, "tags">> {
-//   declare _id: string;
-//   declare authorId: string;
-//   declare author: string;
-//   declare title: string;
-//   declare description: string;
-// }
-
-// TopicModel.init(
-//   {
-//     _id: {
-//       type: DataTypes.UUID,
-//       defaultValue: DataTypes.UUIDV4,
-//       primaryKey: true,
-//     },
-//     authorId: {
-//       type: DataTypes.UUID,
-//       allowNull: false,
-//     },
-//     author: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     title: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     description: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//   },
-//   {
-//     sequelize,
-//     modelName: "topic",
-//     timestamps: false,
-//     underscored: true,
-//     tableName: "topics",
-//   }
-// );
-
-// TopicModel.hasMany(Tags, { foreignKey: "topicId" });
-
-// export default TopicModel;

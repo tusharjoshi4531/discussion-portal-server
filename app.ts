@@ -30,6 +30,7 @@ app.use("/comments", CommentsRouter);
 const { DATABASE_SERVICE } = config;
 
 // Connect to the database
+// console.log("DATABASE_SERVICE", DATABASE_SERVICE, DATABASE_SERVICE === "mongo");
 if (DATABASE_SERVICE === "mongo") {
   connectToMongoDb();
 } else if (DATABASE_SERVICE === "postgres") {

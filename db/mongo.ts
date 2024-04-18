@@ -4,6 +4,7 @@ const mongoDbApiKey = process.env.MONGODB_API_KEY!;
 const tempMongoDbApiKey = process.env.TEMP_MONGO_URL!;
 
 export default function connectToMongoDb() {
+  console.log("connecting to mongoose");
   mongoose.set("strictQuery", false);
   mongoose
     .connect(tempMongoDbApiKey!)

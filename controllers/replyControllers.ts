@@ -1,8 +1,11 @@
 import { RequestHandler } from "express";
 import { IAddReplyRequestBody } from "../types/requests";
 import { AuthorizedRequestBody } from "../types/authentication";
-import ReplyService from "../service/mongo/reply";
-import { Document } from "mongoose";
+import MongoReplyService from "../service/mongo/reply";
+import PostgreReplyService from "../service/postgres/reply";
+
+const ReplyService =
+  process.env.DB === "mongo" ? MongoReplyService : PostgreReplyService;
 
 export const addReply: RequestHandler<
   any,

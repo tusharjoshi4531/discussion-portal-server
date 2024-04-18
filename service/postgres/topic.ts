@@ -1,5 +1,7 @@
+import { Op } from "sequelize";
 import Tags from "../../models/postgres/tag";
 import Topics from "../../models/postgres/topic";
+import User from "../../models/postgres/user";
 import UserStarTopic from "../../models/postgres/userStarTopic";
 import { ITopicData, IResponseTopicData } from "../../types/discussion";
 
@@ -13,23 +15,24 @@ export default {
             {
               model: Tags,
               as: "tags",
-              attributes: ["tag"],
             },
           ],
         });
       } else {
         const query = JSON.parse(tags!);
+        console.log({ query, tags });
         result = await Topics.findAll({
           include: [
             {
               model: Tags,
               as: "tags",
-              attributes: ["tag"],
+              where: {
+                tag: {
+                  [Op.in]: query,
+                },
+              },
             },
           ],
-          where: {
-            tags: { tag: query },
-          },
         });
       }
 
@@ -78,21 +81,13 @@ export default {
   },
   async findStarredByUser(userId: string) {
     try {
-      const result = await Topics.findAll({
-        include: [
-          {
-            model: Tags,
-            as: "tags",
-            attributes: ["tag"],
-          },
-          {
-            model: UserStarTopic,
-            as: "userStarTopic",
-            where: { userId },
-          },
-        ],
+      const result = await UserStarTopic.findAll({
+        where: {
+          userId,
+        },
       });
-      return result.map((topic) => topic._id);
+
+      return result.map((topic) => topic.topicId);
     } catch (err) {
       console.log(err);
       throw new Error("Couldn't find starred topics by given user");

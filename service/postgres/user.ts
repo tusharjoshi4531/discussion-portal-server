@@ -23,7 +23,7 @@ export default {
       return user ? true : false;
     } catch (err) {
       console.log(err);
-      throw new Error("Couldn't fetch user by username");
+      return false;
     }
   },
 

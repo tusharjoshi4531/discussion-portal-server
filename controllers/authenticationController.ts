@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { ILoginRequestBody, ISignUpRequestBody } from "../types/requests";
+import { ILoginRequestQuery, ISignUpRequestBody } from "../types/requests";
 
 import config from "../config/config";
 
@@ -13,12 +13,12 @@ const { DATABASE_SERVICE } = config;
 const UserService =
   DATABASE_SERVICE === "mongo" ? MongoUserService : PostgresUserService;
 
-export const login: RequestHandler<any, any, ILoginRequestBody> = async (
+export const login: RequestHandler<any, any, any, ILoginRequestQuery> = async (
   req,
   res
 ) => {
   // Extract login info from request
-  const { username, password } = req.body;
+  const { username, password } = req.query;
 
   try {
     // Find user in data base
@@ -68,6 +68,6 @@ export const signup: RequestHandler<any, any, ISignUpRequestBody> = async (
     res.status(201).json({ username, token, userId: result._id });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: "something went wrong" });
+    res.status(500).json({ message: "something went wrong" });
   }
 };
