@@ -1,6 +1,7 @@
-import CommentModel from "../../models/mogo/comment";
-import { IComment } from "../../types/discussion";
-import { parseMongoDocumentId } from "../../util/parse";
+
+import CommentModel from "../../../models/mogo/comment";
+import { IComment } from "../../../types/discussion";
+import { parseMongoDocumentId } from "../../../util/parse";
 import UpvoteesParser from "./upvoteesParser";
 
 export default {
