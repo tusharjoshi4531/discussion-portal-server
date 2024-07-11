@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
-import { AuthorizedRequestBody } from "../types/authentication";
-import { IAddCommentRequestBody } from "../types/requests";
 import CommentService from "../service/mongo/comment";
+import { AuthorizedRequestBody } from "../../types/authentication";
+import { IAddCommentRequestBody } from "../../types/requests";
 
 export const addComment: RequestHandler<
   any,

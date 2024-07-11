@@ -1,4 +1,4 @@
-import { IReply } from "../../types/discussion";
+
 
 type UpvoteObject = {
   upvotees: string[];
